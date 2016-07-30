@@ -4,25 +4,43 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
-    android:orientation="horizontal"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:orientation="vertical">
 
-    <LinearLayout
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_centerInParent="true"
+        android:visibility="gone"/>
+
+        <Button
+            android:id="@+id/btn_simple2"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="@string/save_position" />
 
         <Button
             android:id="@+id/btn_simple"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="@string/simple_direction" />
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="@string/Find_my_Car" />
 
-        <Button
-            android:id="@+id/btn_alternative"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="@string/alternative_direction" />-->
 
-    </LinearLayout>
+    <TextView
+        android:id="@+id/location_address_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="18dp"
+        android:layout_weight="0"
+        android:layout_below="@+id/linearLayout"
+        android:layout_alignParentLeft="true"
+        android:lines="4"
+        />
+
+
 </LinearLayout>
