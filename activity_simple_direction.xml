@@ -13,56 +13,42 @@
         android:layout_height="match_parent"
         tools:context=".MapsActivity" />
 
-
-    <Button
-        android:id="@+id/btn_request_direction"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:text="@string/request_direction" />
-
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true">
-
+        android:orientation="horizontal"
+        android:background="#e2e1e1">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/request_direction"
+            android:id="@+id/btn_request_direction" />
+        <ImageView
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_distance"/>
         <TextView
             android:layout_marginLeft="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="0 km"
-            android:id="@+id/distance"
-            android:padding="8dp"
-            android:textSize="20dp" />
+            android:id="@+id/distance" />
+
+        <ImageView
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="5dp"
+            android:src="@drawable/ic_clock"/>
         <TextView
             android:layout_marginLeft="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="0 min"
-            android:id="@+id/duration"
-            android:padding="8dp"
-            android:textSize="20dp" />
-        <TextView
-            android:layout_marginLeft="5dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Start Location"
-            android:id="@+id/start_location"
-            android:padding="8dp"
-            android:textSize="20dp" />
-        <TextView
-            android:layout_marginLeft="5dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="End Location"
-            android:id="@+id/end_location"
-            android:padding="8dp"
-            android:textSize="20dp" />
-
+            android:id="@+id/duration" />
     </LinearLayout>
 
 

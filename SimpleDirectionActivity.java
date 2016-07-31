@@ -1,8 +1,10 @@
 package com.example.android.direction;
 
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -20,7 +22,6 @@ import com.example.android.googledirectionlibrary.model.Leg;
 import com.example.android.googledirectionlibrary.model.Route;
 import com.example.android.googledirectionlibrary.model.Step;
 import com.example.android.googledirectionlibrary.util.DirectionConverter;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -34,7 +35,6 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
     private Button btnRequestDirection;
     private GoogleMap googleMap;
     private String serverKey = "AIzaSyDzpUBcGKhAXcPdE-HRjaZGr8xiKg55mcY";
-    private LatLng camera = new LatLng(44.552164, 10.790994);
     private LatLng origin = new LatLng(44.552164, 10.790994);
     private LatLng destination = new LatLng(44.541826, 10.781694);
     private Info distanceInfo;
@@ -44,16 +44,13 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
     private Leg leg;
     TextView duration_text;
     TextView distance_text;
-    TextView start_text;
-    TextView end_text;
     private Route route;
     private Step step;
     private Info distanceInfo2;
     private Info durationInfo2;
     private String distance2;
     private String duration2;
-    private int i=1;
-    private String maneuver;
+    private int i = 1;
     private String instruction;
 
     @Override
@@ -68,8 +65,6 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
         duration_text = (TextView) findViewById(R.id.duration);
         distance_text = (TextView) findViewById(R.id.distance);
 
-        start_text=(TextView) findViewById(R.id.start_location);
-        end_text=(TextView) findViewById(R.id.end_location);
 
         ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMapAsync(this);
     }
@@ -77,7 +72,17 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(camera, 13));
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        googleMap.setMyLocationEnabled(true);
     }
 
     @Override
@@ -124,49 +129,50 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
             duration_text.setText(duration);
             distance_text.setText(distance);
 
-            start_text.setText(String.valueOf(origin));
-            end_text.setText(String.valueOf(destination));
-
 
             //Because 1 leg can be contain with many step. So you have to retrieve the Step in array.
             //Contiene tutti i vari step,quindi tutte le indicazioni però ancora codificate
-           List<Step> step_list= leg.getStepList();
+            List<Step> step_list = leg.getStepList();
 
-            for(Step s : step_list){
-                Log.i("CONTENUTO STEP LIST : ",String.valueOf(s));
+            for (Step s : step_list) {
+                //Log.i("CONTENUTO STEP LIST : ", String.valueOf(s));
                 //Retrieve the distance and duration of the each step.
                 distanceInfo2 = s.getDistance();
                 durationInfo2 = s.getDuration();
                 distance2 = distanceInfo2.getText();
                 duration2 = durationInfo2.getText();
 
-                Log.i("DISTANZA STEP : " + i,distance2);
-                Log.i("DURATA STEP : " + i,duration2);
+                Log.i("DISTANZA STEP : " + i, distance2);
+                Log.i("DURATA STEP : " + i, duration2);
 
                 //  Navigation instruction is available by retrieve from Maneuver instance of the each step.
                 // HTML instruction also available too but don't forget to convert them from HTML format to
                 // show in your app.
 
                 instruction = s.getHtmlInstruction();
-
-                Log.i("INSTRUCTION : ",instruction);
+                instruction = instruction.replace("<b>", "");
+                instruction = instruction.replace("</b>", "");
+                Log.i("INSTRUCTION : ", instruction);
 
             }
 
-        //So you can retrieve them in LatLgn array directly. Just using getDirectionPoint method
-            ArrayList<LatLng> pointList = leg.getDirectionPoint();
-            //Contiene tutte le coordinate del polylines
-            for(LatLng lt : pointList){
-                Log.i("CONTENUTO ARRAY LIST : ", String.valueOf(lt));
-            }
+
+            //So you can retrieve them in LatLgn array directly. Just using getDirectionPoint method
+           ArrayList<LatLng> pointList = leg.getDirectionPoint();
+           //Contiene tutte le coordinate del polylines
+          for (LatLng lt : pointList) {
+               Log.i("CONTENUTO ARRAY LIST : ", String.valueOf(lt));
+          }
+
 
 
             //   If you want to retrieve the location of the each step.
             //Contiene le coordinate di ogni step
             ArrayList<LatLng> sectionList = leg.getSectionPoint();
-            for(LatLng lt : sectionList){
+            for (LatLng lt : sectionList) {
                 Log.i("CONTENUTO ARRAY STEP : ", String.valueOf(lt));
             }
+
 
 
             btnRequestDirection.setVisibility(View.GONE);
