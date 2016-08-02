@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     android:gravity="center"
     tools:context=".MainActivity"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="#f08502">
 
 
     <ProgressBar
@@ -22,7 +23,8 @@
             android:layout_weight="1"
             android:layout_marginTop="8dp"
             android:text="@string/save_position"
-            android:background="@drawable/button_round"/>
+            android:background="@drawable/button_round"
+            android:textColor="#fffefe" />
 
         <Button
             android:id="@+id/btn_simple"
@@ -32,7 +34,8 @@
             android:layout_height="100dp"
             android:layout_weight="1"
             android:text="@string/Find_my_Car"
-            android:background="@drawable/button_round"/>
+            android:background="@drawable/button_round"
+            android:textColor="#fffefe" />
 
 
     <TextView
@@ -45,7 +48,7 @@
         android:layout_below="@+id/linearLayout"
         android:layout_alignParentLeft="true"
         android:lines="3"
-        />
+        android:textColor="#040404" />
 
 
 </LinearLayout>
