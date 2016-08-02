@@ -4,6 +4,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -38,7 +39,6 @@ import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
@@ -51,7 +51,7 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
     private GoogleMap mGoogleMap;
     private String serverKey = "AIzaSyDzpUBcGKhAXcPdE-HRjaZGr8xiKg55mcY";
     private LatLng origin;
-    private LatLng destination = new LatLng(44.552132, 10.790963);
+    private LatLng destination = new LatLng(44.552185, 10.790824);
     private Info distanceInfo;
     private Info durationInfo;
     private String distance;
@@ -70,7 +70,11 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
     private String duration2;
     private int i = 1;
     private String instruction;
+    private String instruction_save;
+    private int conta_coordinate = 0;
 
+    private String left="left";
+    private String right="right";
 
     private boolean flag=true;
 
@@ -81,6 +85,10 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
     private ArrayList<LatLng> pointList;
 
     private boolean entra=true;
+
+    private int cont=0;
+
+    private Vibrator vib;
 
     //Because 1 leg can be contain with many step. So you have to retrieve the Step in array.
     //Contiene tutti i vari step,quindi tutte le indicazioni però ancora codificate
@@ -94,13 +102,15 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
     LatLng latLng;
 
     SupportMapFragment mFragment;
-    Marker currLocationMarker;
+    //Marker currLocationMarker;
 
     // Instantiating CircleOptions to draw a circle around the marker
     CircleOptions circleOptions = new CircleOptions();
     private Circle myCircle;
 
     PolylineOptions myPolyline =new PolylineOptions();
+
+    String x="arrivato!";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,6 +126,10 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
         duration_step_text=(TextView) findViewById(R.id.duration_step);
         distance_step_text=(TextView) findViewById(R.id.distance_step);
         indication_step_text=(TextView) findViewById(R.id.indication);
+
+        //Initialize the vibrator service
+         vib = (Vibrator) getSystemService(this.VIBRATOR_SERVICE);
+
 
         mFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mFragment.getMapAsync(this);
@@ -230,12 +244,12 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
             LatLngBounds.Builder bc = new LatLngBounds.Builder();
            //Contiene tutte le coordinate del polylines
           for (LatLng lt : pointList) {
-               Log.i("CONTENUTO ARRAY LIST : ", String.valueOf(lt));
+               //Log.i("CONTENUTO ARRAY LIST : ", String.valueOf(lt));
               bc.include(lt);
           }
 
             LatLngBounds bounds = bc.build();
-            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 110));
+            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 120));
 
 
 
@@ -298,9 +312,10 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
 
         //place marker at current position
         //mGoogleMap.clear();
-        if (currLocationMarker != null) {
+/*        if (currLocationMarker != null) {
             currLocationMarker.remove();
-        }
+        }*/
+
         latLng = new LatLng(location.getLatitude(), location.getLongitude());
         origin = latLng;
 
@@ -309,9 +324,9 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
 
         // Toast.makeText(this,"Location Changed",Toast.LENGTH_SHORT).show();
 
-        int conta_coordinate = 0;
+        conta_coordinate = 0;
 
-        if (flag == false && entra==true) {
+        if (!flag && entra) {
             //Contiene le coordinate di ogni step
             if (sectionList != null && !sectionList.isEmpty()) {
                 for (LatLng lt : sectionList) {
@@ -339,6 +354,19 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
                                 instruction = instruction.replace("</div>", "");
                                 instruction = instruction.replace("<div style=\"font-size:0.9em\">", "");
 
+                                if(!instruction_save.equals(instruction)){
+                                    cont++;
+                                    instruction_save=instruction;
+                                    //str1.toLowerCase().contains(str2.toLowerCase())
+                                    if(instruction.toLowerCase().contains(left.toLowerCase())){
+                                        vib.vibrate(3000);
+                                    }
+                                    if(instruction.toLowerCase().contains(right.toLowerCase())){
+                                        vib.vibrate(3000);
+                                        vib.vibrate(3000);
+                                    }
+
+                                }
 
 
                                 //Mostrami le indicazioni
@@ -346,8 +374,13 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
                                 distance_step_text.setText(distance2);
                                 indication_step_text.setText(instruction);
 
-                                
-
+                                Location.distanceBetween(44.552185, 10.790824,
+                                        circleOptions.getCenter().latitude, circleOptions.getCenter().longitude, distance_cerchio);
+                                if (distance_cerchio[0] < circleOptions.getRadius()){
+                                    entra=false;
+                                    indication_step_text.setText(x);
+                                    break;
+                                }
 
                             }
                         }
@@ -360,7 +393,7 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
             }
 
 
-        if(flag==true){
+        if(flag){
             if (step_list != null && !step_list.isEmpty()){
 
                 distanceInfo2= step_list.get(0).getDistance();
@@ -376,6 +409,7 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
                 distance_step_text.setText(distance2);
                 indication_step_text.setText(instruction);
                 flag=false;
+                instruction_save=instruction;
             }
         }
 
