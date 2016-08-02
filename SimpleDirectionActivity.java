@@ -51,7 +51,7 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
     private GoogleMap mGoogleMap;
     private String serverKey = "AIzaSyDzpUBcGKhAXcPdE-HRjaZGr8xiKg55mcY";
     private LatLng origin;
-    private LatLng destination = new LatLng(44.542792, 10.787119);
+    private LatLng destination = new LatLng(44.553134, 10.791660);
     private Info distanceInfo;
     private Info durationInfo;
     private String distance;
@@ -281,9 +281,9 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
         }
 
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(5000); //5 seconds
-        mLocationRequest.setFastestInterval(3000); //3 seconds
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        mLocationRequest.setInterval(2000);
+        mLocationRequest.setFastestInterval(1000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         //mLocationRequest.setSmallestDisplacement(0.1F); //1/10 meter
 
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
@@ -307,9 +307,9 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
         // Toast.makeText(this,"Location Changed",Toast.LENGTH_SHORT).show();
 
         int conta_coordinate = 0;
-        int conta_step = 1;
 
         if (flag == false) {
+            //Contiene le coordinate di ogni step
             if (sectionList != null && !sectionList.isEmpty()) {
                 for (LatLng lt : sectionList) {
 
@@ -321,31 +321,35 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
                     } else {
                         //Toast.makeText(getBaseContext(), "Inside", Toast.LENGTH_LONG).show();
                         //QUA VOGLIO MOSTRARE L'INDICAZIONE RIFERITA ALLA COORDINATA CHE è DENTRO
-                        if (step_list != null && !step_list.isEmpty())
-                            for (Step s : step_list) {
+                        //Contiene tutti i vari step,quindi tutte le indicazioni
+                        if (step_list != null && !step_list.isEmpty()) {
 
-                                distanceInfo2 = s.getDistance();
-                                durationInfo2 = s.getDuration();
-                                distance2 = distanceInfo2.getText();
-                                duration2 = durationInfo2.getText();
-                                instruction = s.getHtmlInstruction();
+                            if(conta_coordinate==0)
+                                    break;
 
-                                if (conta_step == conta_coordinate) {
+                                    distanceInfo2 = step_list.get(conta_coordinate).getDistance();
+                                    durationInfo2 = step_list.get(conta_coordinate).getDuration();
+                                    distance2 = distanceInfo2.getText();
+                                    duration2 = durationInfo2.getText();
+                                    instruction = step_list.get(conta_coordinate).getHtmlInstruction();
+                                    instruction = instruction.replace("<b>", "");
+                                    instruction = instruction.replace("</b>", "");
+                                    instruction=instruction.replace("</div>","");
+                                    instruction=instruction.replace("<div style=\"font-size:0.9em\">","");
+
                                     //Mostrami le indicazioni
                                     duration_step_text.setText(duration2);
                                     distance_step_text.setText(distance2);
                                     indication_step_text.setText(instruction);
                                 }
-
-                                conta_step++;
-                            }
-
                     }
 
                     conta_coordinate++;
+                        }
+
                 }
             }
-        }
+
 
         if(flag==true){
             if (step_list != null && !step_list.isEmpty()){
@@ -355,9 +359,14 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
                 distance2=distanceInfo2.getText();
                 duration2=durationInfo2.getText();
                 instruction=step_list.get(0).getHtmlInstruction();
+                instruction = instruction.replace("<b>", "");
+                instruction = instruction.replace("</b>", "");
+                instruction=instruction.replace("</div>","");
+                instruction=instruction.replace("<div style=\"font-size:0.9em\">","");
                 duration_step_text.setText(duration2);
                 distance_step_text.setText(distance2);
                 indication_step_text.setText(instruction);
+                flag=false;
             }
         }
 
