@@ -51,7 +51,7 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
     private GoogleMap mGoogleMap;
     private String serverKey = "AIzaSyDzpUBcGKhAXcPdE-HRjaZGr8xiKg55mcY";
     private LatLng origin;
-    private LatLng destination = new LatLng(44.553134, 10.791660);
+    private LatLng destination = new LatLng(44.552132, 10.790963);
     private Info distanceInfo;
     private Info durationInfo;
     private String distance;
@@ -71,6 +71,7 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
     private int i = 1;
     private String instruction;
 
+
     private boolean flag=true;
 
     private float[] distance_cerchio = new float[2];
@@ -78,6 +79,8 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
     protected ArrayList<LatLng> sectionList;
 
     private ArrayList<LatLng> pointList;
+
+    private boolean entra=true;
 
     //Because 1 leg can be contain with many step. So you have to retrieve the Step in array.
     //Contiene tutti i vari step,quindi tutte le indicazioni però ancora codificate
@@ -308,7 +311,7 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
 
         int conta_coordinate = 0;
 
-        if (flag == false) {
+        if (flag == false && entra==true) {
             //Contiene le coordinate di ogni step
             if (sectionList != null && !sectionList.isEmpty()) {
                 for (LatLng lt : sectionList) {
@@ -324,24 +327,30 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
                         //Contiene tutti i vari step,quindi tutte le indicazioni
                         if (step_list != null && !step_list.isEmpty()) {
 
-                            if(conta_coordinate==0)
-                                    break;
+                            if (conta_coordinate > 0) {
 
-                                    distanceInfo2 = step_list.get(conta_coordinate).getDistance();
-                                    durationInfo2 = step_list.get(conta_coordinate).getDuration();
-                                    distance2 = distanceInfo2.getText();
-                                    duration2 = durationInfo2.getText();
-                                    instruction = step_list.get(conta_coordinate).getHtmlInstruction();
-                                    instruction = instruction.replace("<b>", "");
-                                    instruction = instruction.replace("</b>", "");
-                                    instruction=instruction.replace("</div>","");
-                                    instruction=instruction.replace("<div style=\"font-size:0.9em\">","");
+                                distanceInfo2 = step_list.get(conta_coordinate).getDistance();
+                                durationInfo2 = step_list.get(conta_coordinate).getDuration();
+                                distance2 = distanceInfo2.getText();
+                                duration2 = durationInfo2.getText();
+                                instruction = step_list.get(conta_coordinate).getHtmlInstruction();
+                                instruction = instruction.replace("<b>", "");
+                                instruction = instruction.replace("</b>", "");
+                                instruction = instruction.replace("</div>", "");
+                                instruction = instruction.replace("<div style=\"font-size:0.9em\">", "");
 
-                                    //Mostrami le indicazioni
-                                    duration_step_text.setText(duration2);
-                                    distance_step_text.setText(distance2);
-                                    indication_step_text.setText(instruction);
-                                }
+
+
+                                //Mostrami le indicazioni
+                                duration_step_text.setText(duration2);
+                                distance_step_text.setText(distance2);
+                                indication_step_text.setText(instruction);
+
+                                
+
+
+                            }
+                        }
                     }
 
                     conta_coordinate++;
