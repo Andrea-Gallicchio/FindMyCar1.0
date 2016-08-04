@@ -1,9 +1,8 @@
 <resources>
-    <string name="app_name">Google Direction Library Demo</string>
-    <string name="title_activity_maps">Map</string>
-    <string name="simple_direction">Simple Direction</string>
+    <string name="app_name">FindMyCar</string>
+    <string name="title_activity_maps">FindMyCar</string>
+    <string name="simple_direction">FindMyCar</string>
     <string name="save_position">Save Position</string>
-    <string name="alternative_direction">Alternative Direction</string>
     <string name="request_direction">Request Direction</string>
     <string name="Find_my_Car">Find My Car</string>
     <string name="no_geocoder_available">No geocoder available</string>

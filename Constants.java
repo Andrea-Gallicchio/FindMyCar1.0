@@ -1,7 +1,7 @@
 package com.example.android.direction;
 
 /**
- * Created by Utilizzatore on 30/07/2016.
+ * Created by Utilizzatore on 04/08/2016.
  */
 public class Constants {
     public static final int SUCCESS_RESULT = 0;

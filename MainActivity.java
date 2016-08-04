@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,17 +26,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     String preLongStr;
     String postLongStr;
 
+    private Button btn;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        btn = (Button) findViewById(R.id.btn_simple);
+        btn.setEnabled(false);
+
         findViewById(R.id.btn_simple).setOnClickListener(this);
         findViewById(R.id.btn_simple2).setOnClickListener(this);
+        findViewById(R.id.imageView).setOnClickListener(this);
         mLocationAddressTextView = (TextView) findViewById(R.id.location_address_view);
 
 
-            readFileInEditor();
+        readFileInEditor();
 
     }
 
@@ -76,6 +84,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                  //Once the whole file is read, we send the text into the editor
                 mLocationAddressTextView.setText("Parked in :" + '\n' + preLongStr + "\n" + postLongStr);
+                btn.setEnabled(true);
             }
         }
         catch (java.io.FileNotFoundException e) {
@@ -95,7 +104,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             goToSimpleDirection();
         }
         else if ( id == R.id.btn_simple2){
+            btn.setEnabled(true);
             goToSavePosition();
+        }
+        else if (id == R.id.imageView){
+            goToInstructions();
         }
     }
 
@@ -104,6 +117,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void goToSavePosition() { openActivity(SavePosition.class);}
+
+    public void goToInstructions() {openActivity(Instructions.class);}
 
     public void openActivity(Class<?> cs) {
         startActivity(new Intent(this, cs));

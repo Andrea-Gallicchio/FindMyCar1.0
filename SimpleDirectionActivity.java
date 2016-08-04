@@ -3,6 +3,9 @@ package com.example.android.direction;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.design.widget.Snackbar;
@@ -11,6 +14,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +47,9 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,7 +59,7 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
     private GoogleMap mGoogleMap;
     private String serverKey = "AIzaSyDzpUBcGKhAXcPdE-HRjaZGr8xiKg55mcY";
     private LatLng origin;
-    private LatLng destination = new LatLng(44.552185, 10.790824);
+    private LatLng destination;
     private Info distanceInfo;
     private Info durationInfo;
     private String distance;
@@ -86,9 +94,20 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
 
     private boolean entra=true;
 
-    private int cont=0;
 
+    // Get instance of Vibrator from current Context
     private Vibrator vib;
+
+    private String mRoundabout="roundabout";
+    private String mFirst="1st";
+    private String mSecond="2nd";
+    private String mThird="3rd";
+    private String mFourth="4th";
+    private String mFifth="5th";
+
+
+    //Variabile per il radio button
+    private boolean flag_radio=false;
 
     //Because 1 leg can be contain with many step. So you have to retrieve the Step in array.
     //Contiene tutti i vari step,quindi tutte le indicazioni però ancora codificate
@@ -110,17 +129,30 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
 
     PolylineOptions myPolyline =new PolylineOptions();
 
-    String x="arrivato!";
+    String mArrive="You Are Arrive";
+    String mArrive_space="";
+
+
+    private final static String filename_coordinate="myfile_coordinate.txt";
+
+    int j=0;
+    double x,y;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_simple_direction);
 
+        readFileInEditor();
+
         btnRequestDirection = (Button) findViewById(R.id.btn_request_direction);
 
         btnRequestDirection.setOnClickListener(this);
 
+        destination=new LatLng(SavePosition.pos_latitude,SavePosition.pos_longitude);
+        Log.i("LATITUDE : ",String.valueOf(SavePosition.pos_longitude));
+
+        Log.i("ERRORE : ",destination.toString());
         duration_text = (TextView) findViewById(R.id.duration);
         distance_text = (TextView) findViewById(R.id.distance);
         duration_step_text=(TextView) findViewById(R.id.duration_step);
@@ -133,6 +165,55 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
 
         mFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mFragment.getMapAsync(this);
+    }
+
+    //method that reads this newly-created file and populates the text editor with the contents of the file
+    public void readFileInEditor()
+    {
+        try {
+            //Open the file with openFileInput,and then create an InputStream from it
+            InputStream in = openFileInput(filename_coordinate);
+
+            if (in != null) {
+                //Create an InputStreamReader
+                InputStreamReader tmp=new InputStreamReader(in);
+                //Create a BufferedReader,Using the BufferedReader, we read line after line the text
+                // of the storage file, and we store the text in the buffer
+                BufferedReader reader=new BufferedReader(tmp);
+                String str;
+                StringBuilder buf=new StringBuilder();
+
+
+                while ((str = reader.readLine()) != null) {
+
+                    buf.append(str);
+                    Log.i("LETTURA FILE2: ",String.valueOf(str));
+                    if(j==0){
+                       x =Double.parseDouble(str);
+                    }
+                    else
+                        y=Double.parseDouble(str);
+                    j++;
+
+                }
+
+                in.close();
+
+            }
+        }
+        catch (java.io.FileNotFoundException e) {
+
+            // that's OK, we probably haven't created it yet
+        }
+        catch (Throwable t) {
+            Toast.makeText(this, "Exception: "+t.toString(), Toast.LENGTH_LONG).show();
+
+        }
+
+        destination=new LatLng(x,y);
+
+        Log.i("DESTINATION ", String.valueOf((destination)));
+
     }
 
     @Override
@@ -148,6 +229,8 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
         buildGoogleApiClient();
 
         mGoogleApiClient.connect();
+
+
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -164,6 +247,33 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
         int id = v.getId();
         if (id == R.id.btn_request_direction) {
             requestDirection();
+        }
+    }
+
+    public void onRadioButtonClicked(View view) {
+        // Is the button now checked?
+        boolean checked = ((RadioButton) view).isChecked();
+        RadioGroup radioButton = (RadioGroup) findViewById(R.id.radio);
+
+        // Check which radio button was clicked
+        switch(view.getId()) {
+            case R.id.radio_vibration:
+
+                if(checked && flag_radio==true)
+                {
+                    flag_radio=false;
+                    radioButton.clearCheck();
+                    Toast.makeText(this,"Vibration Mode DISABLED",Toast.LENGTH_SHORT).show();
+                    break;
+                }
+
+                if (checked && flag_radio==false)
+                {
+                    flag_radio=true;
+                    Toast.makeText(this,"Vibration Mode ENABLED",Toast.LENGTH_SHORT).show();
+                    break;
+                }
+
         }
     }
 
@@ -295,11 +405,12 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
             latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
             origin=latLng;
 
+            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(origin, 16));
         }
 
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(2000);
-        mLocationRequest.setFastestInterval(1000);
+        mLocationRequest.setInterval(1000);
+        mLocationRequest.setFastestInterval(500);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         //mLocationRequest.setSmallestDisplacement(0.1F); //1/10 meter
 
@@ -340,6 +451,32 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
                         //Toast.makeText(getBaseContext(), "Inside", Toast.LENGTH_LONG).show();
                         //QUA VOGLIO MOSTRARE L'INDICAZIONE RIFERITA ALLA COORDINATA CHE è DENTRO
                         //Contiene tutti i vari step,quindi tutte le indicazioni
+
+                        Location.distanceBetween(destination.latitude, destination.longitude,
+                                circleOptions.getCenter().latitude, circleOptions.getCenter().longitude, distance_cerchio);
+                        if (distance_cerchio[0] < circleOptions.getRadius()){
+                            entra=false;
+                           //Notification with sound
+                            Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+
+                            if (notification==null){
+                                notification=RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+                                if(notification==null){
+                                    notification=RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+                                }
+                            }
+                            Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+                            r.play();
+
+
+                            indication_step_text.setText(mArrive);
+                            duration_step_text.setText(mArrive_space);
+                            distance_step_text.setText(mArrive_space);
+
+                            break;
+                        }
+
                         if (step_list != null && !step_list.isEmpty()) {
 
                             if (conta_coordinate > 0) {
@@ -353,34 +490,60 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
                                 instruction = instruction.replace("</b>", "");
                                 instruction = instruction.replace("</div>", "");
                                 instruction = instruction.replace("<div style=\"font-size:0.9em\">", "");
+                                instruction = instruction.replace("Destination", " Destination");
 
-                                if(!instruction_save.equals(instruction)){
-                                    cont++;
+                                if(!instruction_save.equals(instruction) && flag_radio == true){
                                     instruction_save=instruction;
-                                    //str1.toLowerCase().contains(str2.toLowerCase())
+
+
+                                    //Gira a sinistra vibra 1 volta
                                     if(instruction.toLowerCase().contains(left.toLowerCase())){
-                                        vib.vibrate(3000);
+                                        vib.vibrate(1000);
                                     }
+
+                                    //Gira a destra vibra due volte
                                     if(instruction.toLowerCase().contains(right.toLowerCase())){
-                                        vib.vibrate(3000);
-                                        vib.vibrate(3000);
+                                        long[] pattern = {0,1000,500,1000};
+                                        vib.vibrate(pattern,-1);
                                     }
+
+                                    //Verifica di essere in una rotonda,dopodichè vibra 1 volta se devi prendere la prima
+                                    //uscita,due volte per la seconda uscita e cosi via
+                                    if(instruction.toLowerCase().contains(mRoundabout.toLowerCase())){
+
+                                            if(instruction.toLowerCase().contains(mFirst.toLowerCase())){
+                                                vib.vibrate(1000);
+                                            }
+
+                                            if(instruction.toLowerCase().contains(mSecond.toLowerCase())){
+                                                long[] pattern = {0,1000,500,1000};
+                                                vib.vibrate(pattern,-1);
+                                            }
+
+                                            if(instruction.toLowerCase().contains(mThird.toLowerCase())){
+                                                long[] pattern={0,250,200,250,200,250};
+                                                vib.vibrate(pattern,-1);
+                                            }
+
+                                            if(instruction.toLowerCase().contains(mFourth.toLowerCase())){
+                                                long[] pattern={0,250,200,250,200,250,200,250};
+                                                vib.vibrate(pattern,-1);
+                                            }
+
+                                             if(instruction.toLowerCase().contains(mFifth.toLowerCase())){
+                                                 long[] pattern={0,250,200,250,200,250,200,250,200,250};
+                                                  vib.vibrate(pattern,-1);
+                                        }
+                                    }
+
 
                                 }
-
 
                                 //Mostrami le indicazioni
                                 duration_step_text.setText(duration2);
                                 distance_step_text.setText(distance2);
                                 indication_step_text.setText(instruction);
 
-                                Location.distanceBetween(44.552185, 10.790824,
-                                        circleOptions.getCenter().latitude, circleOptions.getCenter().longitude, distance_cerchio);
-                                if (distance_cerchio[0] < circleOptions.getRadius()){
-                                    entra=false;
-                                    indication_step_text.setText(x);
-                                    break;
-                                }
 
                             }
                         }
@@ -405,11 +568,55 @@ public class SimpleDirectionActivity extends AppCompatActivity implements OnMapR
                 instruction = instruction.replace("</b>", "");
                 instruction=instruction.replace("</div>","");
                 instruction=instruction.replace("<div style=\"font-size:0.9em\">","");
+                instruction = instruction.replace("Destination", " Destination");
                 duration_step_text.setText(duration2);
                 distance_step_text.setText(distance2);
                 indication_step_text.setText(instruction);
                 flag=false;
                 instruction_save=instruction;
+
+                if(flag_radio){
+
+                    //Gira a sinistra vibra 1 volta
+                    if(instruction.toLowerCase().contains(left.toLowerCase())){
+                        vib.vibrate(1000);
+                    }
+
+                    //Gira a destra vibra due volte
+                    if(instruction.toLowerCase().contains(right.toLowerCase())){
+                        long[] pattern = {0,1000,500,1000};
+                        vib.vibrate(pattern,-1);
+                    }
+
+                    //Verifica di essere in una rotonda,dopodichè vibra 1 volta se devi prendere la prima
+                    //uscita,due volte per la seconda uscita e cosi via
+                    if(instruction.toLowerCase().contains(mRoundabout.toLowerCase())){
+
+                        if(instruction.toLowerCase().contains(mFirst.toLowerCase())){
+                            vib.vibrate(1000);
+                        }
+
+                        if(instruction.toLowerCase().contains(mSecond.toLowerCase())){
+                            long[] pattern = {0,1000,500,1000};
+                            vib.vibrate(pattern,-1);
+                        }
+
+                        if(instruction.toLowerCase().contains(mThird.toLowerCase())){
+                            long[] pattern={0,250,200,250,200,250};
+                            vib.vibrate(pattern,-1);
+                        }
+
+                        if(instruction.toLowerCase().contains(mFourth.toLowerCase())){
+                            long[] pattern={0,250,200,250,200,250,200,250};
+                            vib.vibrate(pattern,-1);
+                        }
+
+                        if(instruction.toLowerCase().contains(mFifth.toLowerCase())){
+                            long[] pattern={0,250,200,250,200,250,200,250,200,250};
+                            vib.vibrate(pattern,-1);
+                        }
+                    }
+                }
             }
         }
 

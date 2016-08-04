@@ -12,6 +12,8 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.VIBRATE"/>
+
 
     <application
         android:allowBackup="true"
@@ -34,13 +36,24 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".SimpleDirectionActivity"
-            android:label="@string/simple_direction" />
 
         <activity
-            android:name=".AlternativeDirectionActivity"
-            android:label="@string/alternative_direction" />
+            android:name=".SimpleDirectionActivity"
+            android:label="@string/Find_my_Car" />
+
+
+        <activity
+            android:name=".SavePosition"
+            android:label="@string/Find_my_Car"/>
+
+        <activity
+            android:name=".Instructions"
+            android:label="Instruction" />
+
+        <service
+            android:name=".FetchAddressIntentService"
+            />
+
 
     </application>
 

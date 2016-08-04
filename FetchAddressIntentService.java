@@ -1,5 +1,8 @@
 package com.example.android.direction;
 
+/**
+ * Created by Utilizzatore on 04/08/2016.
+ */
 import android.app.IntentService;
 import android.content.Intent;
 import android.location.Address;
@@ -21,7 +24,6 @@ import java.util.Locale;
 public class FetchAddressIntentService extends IntentService {
 
     private static final String TAG = "FetchAddressIS";
-    private final static String filename="myfile.txt";
 
     /**
      * The receiver where results are forwarded from this service.

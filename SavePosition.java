@@ -32,6 +32,8 @@ public class SavePosition extends AppCompatActivity implements
 
     protected static final String TAG = "SavePosition";
 
+    public static double pos_latitude,pos_longitude;
+
     protected static final String ADDRESS_REQUESTED_KEY = "address-request-pending";
     protected static final String LOCATION_ADDRESS_KEY = "location-address";
 
@@ -43,9 +45,10 @@ public class SavePosition extends AppCompatActivity implements
     /**
      * Represents a geographical location.
      */
-    protected Location mLastLocation;
+    public Location mLastLocation;
 
     private final static String filename="myfile.txt";
+    private final static String filename_coordinate="myfile_coordinate.txt";
 
     /**
      * Tracks whether the user has requested an address. Becomes true when the user requests an
@@ -80,7 +83,7 @@ public class SavePosition extends AppCompatActivity implements
     /**
      * Kicks off the request to fetch an address when pressed.
      */
-   // Button mFetchAddressButton;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -157,7 +160,13 @@ public class SavePosition extends AppCompatActivity implements
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
+
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        pos_latitude=mLastLocation.getLatitude();
+        pos_longitude=mLastLocation.getLongitude();
+        Log.i("LOCATION : ",mLastLocation.toString());
+        saveCoordinate();
+
         if (mLastLocation != null) {
             // Determine whether a Geocoder is available.
             if (!Geocoder.isPresent()) {
@@ -175,6 +184,29 @@ public class SavePosition extends AppCompatActivity implements
         }
     }
 
+
+    protected void saveCoordinate(){
+        try {
+            //openFileOutput open a file
+            OutputStreamWriter out= new OutputStreamWriter(openFileOutput(filename_coordinate, this.MODE_PRIVATE));
+
+            String separator = System.getProperty("line.separator");
+            out.write(String.valueOf(pos_latitude));
+            out.write(separator);
+            out.write(String.valueOf(pos_longitude));
+
+            out.flush();
+            out.close();
+
+            Log.i("COORDINATE ","SALVATE ");
+
+        }
+
+        catch (Throwable t) {
+
+            Toast.makeText(this, "Exception: "+t.toString(), Toast.LENGTH_SHORT).show();
+        }
+    }
     /**
      * Creates an intent, adds location data to it as an extra, and starts the intent service for
      * fetching an address.
@@ -225,7 +257,7 @@ public class SavePosition extends AppCompatActivity implements
 
             out.close();
 
-            Toast.makeText(this, "The contents are saved in the file.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Position Saved", Toast.LENGTH_SHORT).show();
         }
 
         catch (Throwable t) {
