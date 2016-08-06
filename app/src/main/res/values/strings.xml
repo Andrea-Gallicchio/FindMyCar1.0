@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">FindMyCar</string>
+    <string name="title_activity_maps">FindMyCar</string>
+    <string name="simple_direction">FindMyCar</string>
+    <string name="request_direction">Request Direction</string>
+    <string name="Find_my_Car">Find My Car</string>
+    <string name="no_geocoder_available">No geocoder available</string>
+    <string name="address_found">Address found</string>
+    <string name="no_location_data_provided">No location data provided</string>
+    <string name="service_not_available">Sorry, the service is not available</string>
+    <string name="invalid_lat_long_used">Invalid latitude or longitude used</string>
+    <string name="no_address_found">Sorry, no address found</string>
+    <string name="find_my_car">FIND MY CAR</string>
+    <string name="yout_current_position">Yout current position</string>
+    <string name="Find_my_car">FIND MY CAR</string>
+    <string name="check_and_save_position">CHECK AND SAVE POSITION</string>
+    <string name="FIND_MY_CAR">FIND MY CAR</string>
+    <string name="check_below_your_curren_position">Check below your curren position</string>
+    <string name="save_position">SAVE POSITION</string>
+    <string name="Info">Info</string>
+</resources>
